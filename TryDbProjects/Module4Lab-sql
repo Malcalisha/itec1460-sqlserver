@@ -1,0 +1,36 @@
+--Join customers and orders table because the customer ID is a field
+--in both tables (primary key in customers and the foriegn key in order)
+SELECT C.CompanyName, O.OrderDate FROM Customers AS c 
+JOIN Orders AS o ON c.CustomerID = o.CustomerID;
+
+-- Query to see all customer (left table) and the orders (right table)
+-- Uses a left join (order date and order id will be if the customer exists but has no orders)
+SELECT C.CompanyName, O.OrderDate FROM Customers AS c 
+JOIN Orders AS o ON c.CustomerID = o.CustomerID;
+
+-- Example of using built-in function SUM(), ROUND() and COUNT()
+SELECT OrderID, ROUND(SUM(UnitPrice * Quanity * (1 - Discount)),2) AS TotalValue, COUNT(*) AS NumberOfItems 
+FROM [Order Details] GROUP BY OrderID ORDER BY TotalValue DESC;  /* Show the highest value first*/
+
+--Example of using GROUP BY with a HAVING Clause
+SELECT p. ProductionID, p.ProductName, COUNT(od.OrderID) AS TimesOrdered
+FROM Products o INNER JOIN [Oder Details] od ON p.ProductID = od. ProductID
+GROUP BY p.ProductID, p. ProductName
+Having COUNT(od.OrderID) > 10
+ORDER BY TimesOrdered DESC;
+
+-- Subquery Example
+SELECT ProductName, UnitPrice FROM Products
+WHERE UnitPrice > (SELECT AVG(UnitPrice) FROM Products)
+ORDER BY UnitPrice;
+
+-- This query we limit the results to the TOP 5 records
+SELECT TOP 5
+c.customerID, c.CompanyName, 
+ROUND(SUM(od.UnitPrice * od.Quantity *(1-od.Discount)), 2) AS TotalPurchase
+FROM Customers c
+INNER JOIN Orders o ON c.CustomerID = o.CustomerID
+INNER JOIN [Order Details] od ON o.OrderID = od. OrderID
+WHERE YEAR(o.OrderDate) = 1997
+GROUP BY c.CustomerID, c.CompanyName
+ORDER BY TotalPurchase DESC;
